@@ -594,29 +594,33 @@ mark.hl {
   to { opacity: 1; transform: none; }
 }
 
-/* real photos */
+/* real photos, laid out as a little collage */
 .photo-stack {
-  position: relative;
-  height: 290px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+  column-gap: 12px;
+  row-gap: 16px;
+  padding: 10px 2px 6px;
 }
 
 .photo {
-  position: absolute;
-  top: 8px;
+  position: relative;
   display: flex;
-  width: min(46%, 186px);
+  width: 100%;
   flex-direction: column;
   border: 0;
   background: #fff;
-  padding: 8px 8px 0;
+  padding: 7px 7px 0;
   box-shadow: 0 12px 26px rgba(120, 64, 74, 0.18);
   cursor: pointer;
   transition: rotate 0.35s ease, scale 0.35s ease, translate 0.35s ease, filter 0.35s ease;
   animation: drop-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1.2) both;
 }
 
-.photo-left { left: 5%; }
-.photo-right { right: 5%; top: 26px; }
+.photo[data-wide="true"] {
+  grid-column: 1 / -1;
+}
 
 .photo[data-front="true"] {
   z-index: 3;

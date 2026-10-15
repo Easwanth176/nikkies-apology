@@ -39,6 +39,10 @@ export type LetterPage =
         caption: string;
         tilt: number;
         focus: string;
+        /** CSS aspect-ratio. Defaults to a portrait polaroid. */
+        ratio?: string;
+        /** Spans the row, for wide shots. */
+        wide?: boolean;
       }[];
     })
   | (BasePage & {
@@ -96,7 +100,7 @@ export const letter = {
     },
     {
       kind: "photos",
-      kicker: "exhibit a & b",
+      kicker: "already ours",
       title: "some memories are already made.",
       body: "Proof that we're already good at this.",
       hint: "tap a photo to bring it closer",
@@ -105,15 +109,41 @@ export const letter = {
           src: "/memories/cutie-pie.jpg",
           alt: "A candid classroom photo captioned cutie pie, with a little red bow sticker",
           caption: "cutie pie",
-          tilt: -6,
+          tilt: -4,
           focus: "50% 64%",
+        },
+        {
+          src: "/memories/time-will-tell.jpeg",
+          alt: "A yellow note with a hand-drawn banner that reads Time Will Tell",
+          caption: "time will tell",
+          tilt: 3,
+          focus: "50% 46%",
+          ratio: "3 / 4",
+        },
+        {
+          src: "/memories/late-night.jpeg",
+          alt: "Two friends walking side by side at night",
+          caption: "late night",
+          tilt: -1,
+          focus: "50% 42%",
+          ratio: "8 / 5",
+          wide: true,
+        },
+        {
+          src: "/memories/unlikely-friends.jpeg",
+          alt: "A black cat leaning down toward a spotted rabbit on a wooden deck",
+          caption: "unlikely friends",
+          tilt: -3,
+          focus: "50% 50%",
+          ratio: "1 / 1",
         },
         {
           src: "/memories/starry-painting.png",
           alt: "A small painting of a person looking up at a starry blue sky",
           caption: "under the same stars",
-          tilt: 5,
+          tilt: 4,
           focus: "50% 50%",
+          ratio: "1 / 1",
         },
       ],
     },

@@ -341,24 +341,25 @@ function PhotoStack({
           <button
             key={photo.src}
             type="button"
-            className={`photo photo-${index === 0 ? "left" : "right"}`}
+            className="photo"
+            data-wide={photo.wide || undefined}
             data-front={front === index}
             aria-pressed={front === index}
             aria-label={`${photo.caption}: ${photo.alt}`}
             onClick={() => setFront(index)}
             style={{
               rotate: `${front === index ? photo.tilt / 2 : photo.tilt}deg`,
-              animationDelay: `${0.15 + index * 0.15}s`,
+              animationDelay: `${0.12 + index * 0.08}s`,
             }}
           >
-            <span className="photo-img">
+            <span className="photo-img" style={{ aspectRatio: photo.ratio ?? "4 / 5" }}>
               <Image
                 src={photo.src}
                 alt={photo.alt}
                 fill
-                sizes="(max-width: 430px) 48vw, 200px"
+                sizes={photo.wide ? "(max-width: 430px) 88vw, 360px" : "(max-width: 430px) 44vw, 180px"}
                 style={{ objectFit: "cover", objectPosition: photo.focus }}
-                priority={index === 0}
+                priority={index < 2}
               />
             </span>
             <span className="photo-caption">{photo.caption}</span>
