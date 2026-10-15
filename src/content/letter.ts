@@ -1,7 +1,10 @@
 /**
  * Words for the letter. Wrap a word in {braces} to marker-highlight it.
  * Palette lives in src/app/globals.css (`:root`), fonts in src/app/layout.tsx.
+ * Photos live in public/memories.
  */
+import type { Pose } from "@/components/friends";
+
 export type StickerName =
   | "heart"
   | "star"
@@ -22,7 +25,22 @@ type BasePage = {
 };
 
 export type LetterPage =
-  | (BasePage & { kind: "text"; stickers: StickerName[] })
+  | (BasePage & {
+      kind: "text";
+      stickers: StickerName[];
+      friends?: { pose: Pose; bubble?: string };
+    })
+  | (BasePage & {
+      kind: "photos";
+      hint: string;
+      photos: {
+        src: string;
+        alt: string;
+        caption: string;
+        tilt: number;
+        focus: string;
+      }[];
+    })
   | (BasePage & {
       kind: "bucket";
       hint: string;
@@ -37,7 +55,7 @@ export type LetterPage =
         tilt: number;
       }[];
     })
-  | (BasePage & { kind: "promise"; word: string; stickers: StickerName[] });
+  | (BasePage & { kind: "promise"; word: string });
 
 export type ReplySticker = {
   id: string;
@@ -59,14 +77,16 @@ export const letter = {
       kicker: "hey nikkie",
       title: "i'm sorry for whatever happened.",
       body: "No long speech, no keeping score. Whatever it was, I don't want it sitting between us anymore. You mean way more to me than being right ever could.",
-      stickers: ["heart", "pencil"],
+      stickers: [],
+      friends: { pose: "sorry", bubble: "sorry!" },
     },
     {
       kind: "text",
       kicker: "a fresh page",
       title: "let's make things better again.",
       body: "Same us, a little wiser. Laugh about the silly stuff, talk through the real stuff, and go back to being the two people who make every boring day better.",
-      stickers: ["coffee", "star"],
+      stickers: [],
+      friends: { pose: "highfive" },
     },
     {
       kind: "text",
@@ -74,6 +94,29 @@ export const letter = {
       title: "this time is never coming back.",
       body: "Lovely Professional University only happens once. The lectures we half-listen to, the canteen gossip, the walks that take forever. I want the rest of it with you, not as a story I tell later about someone I lost.",
       stickers: ["campus", "books"],
+    },
+    {
+      kind: "photos",
+      kicker: "exhibit a & b",
+      title: "some memories are already made.",
+      body: "Proof that we're already good at this.",
+      hint: "tap a photo to bring it closer",
+      photos: [
+        {
+          src: "/memories/cutie-pie.jpg",
+          alt: "A candid classroom photo captioned cutie pie, with a little red bow sticker",
+          caption: "cutie pie",
+          tilt: -6,
+          focus: "50% 64%",
+        },
+        {
+          src: "/memories/starry-painting.png",
+          alt: "A small painting of a person looking up at a starry blue sky",
+          caption: "under the same stars",
+          tilt: 5,
+          focus: "50% 50%",
+        },
+      ],
     },
     {
       kind: "bucket",
@@ -106,7 +149,6 @@ export const letter = {
       title: "i hope nothing in this world ruins our {friendship}.",
       body: "Not a fight. Not a bad week. Not the day we walk out of Lovely Professional University. Whatever comes after campus, we find our way back.",
       word: "friendship",
-      stickers: ["pennant", "heart"],
     },
     {
       kind: "text",

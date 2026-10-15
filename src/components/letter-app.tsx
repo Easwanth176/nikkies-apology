@@ -1,43 +1,46 @@
 "use client";
 
+import Image from "next/image";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { letter, type LetterPage, type StickerName } from "@/content/letter";
 import { Sticker } from "@/components/stickers";
+import { Friends } from "@/components/friends";
+import { Confetti } from "@/components/confetti";
 
-type Phase = "sealed" | "opening" | "reading" | "folded";
+type Phase = "sealed" | "reading" | "folded";
+type Direction = "next" | "back";
 
 export function LetterApp() {
   const [phase, setPhase] = useState<Phase>("sealed");
   const [page, setPage] = useState(0);
+  const [direction, setDirection] = useState<Direction>("next");
   const [replies, setReplies] = useState<string[]>([]);
   const [plans, setPlans] = useState<string[]>([]);
+  const [burst, setBurst] = useState(0);
   const startX = useRef<number | null>(null);
-  const timer = useRef<number | null>(null);
 
-  useEffect(() => {
-    return () => {
-      if (timer.current) window.clearTimeout(timer.current);
-    };
-  }, []);
+  const celebrate = useCallback(() => setBurst((count) => count + 1), []);
 
   const openLetter = useCallback(() => {
-    if (phase === "reading") return;
-    if (timer.current) window.clearTimeout(timer.current);
+    setDirection("next");
     setPage(0);
     setPhase("reading");
-  }, [phase]);
+  }, []);
 
   const next = useCallback(() => {
     if (page >= letter.pages.length - 1) {
       setPhase("folded");
       return;
     }
+    setDirection("next");
     setPage((current) => current + 1);
   }, [page]);
 
   const back = useCallback(() => {
-    setPage((current) => Math.max(0, current - 1));
-  }, []);
+    if (page === 0) return;
+    setDirection("back");
+    setPage((current) => current - 1);
+  }, [page]);
 
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
@@ -62,6 +65,17 @@ export function LetterApp() {
     if (delta > 48) back();
   }
 
+  function togglePlan(id: string, total: number) {
+    const nextPlans = toggle(plans, id);
+    setPlans(nextPlans);
+    if (nextPlans.length === total && !plans.includes(id)) celebrate();
+  }
+
+  function toggleReply(id: string) {
+    if (!replies.includes(id)) celebrate();
+    setReplies((list) => toggle(list, id));
+  }
+
   const current = letter.pages[page];
   const last = page === letter.pages.length - 1;
 
@@ -69,6 +83,7 @@ export function LetterApp() {
     <main className="desk">
       <section className="sheet" aria-label={`A letter for ${letter.recipient}`}>
         <Petals />
+        {burst > 0 ? <Confetti key={burst} /> : null}
         {phase === "reading" ? (
           <article
             className="pad-safe relative z-10 flex min-h-0 flex-1 flex-col overflow-hidden px-6"
@@ -87,7 +102,7 @@ export function LetterApp() {
 
             <div
               key={page}
-              className="rise mt-6 flex min-h-0 flex-1 flex-col overflow-y-auto pb-2"
+              className={`page-in page-in-${direction} mt-6 flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto pb-2`}
             >
               <p className="text-sm font-bold tracking-[0.22em] text-blush-deep uppercase">
                 {current.kicker}
@@ -99,11 +114,7 @@ export function LetterApp() {
                 <Rich text={current.body} />
               </p>
 
-              <PageExtras
-                page={current}
-                plans={plans}
-                onTogglePlan={(id) => setPlans((list) => toggle(list, id))}
-              />
+              <PageExtras page={current} plans={plans} onTogglePlan={togglePlan} />
 
               {last ? (
                 <div className="mt-6">
@@ -130,14 +141,9 @@ export function LetterApp() {
                         className="sticker"
                         data-stuck={replies.includes(reply.id)}
                         aria-pressed={replies.includes(reply.id)}
-                        onClick={() =>
-                          setReplies((list) => toggle(list, reply.id))
-                        }
+                        onClick={() => toggleReply(reply.id)}
                       >
-                        <Sticker
-                          name={reply.sticker}
-                          className="text-blush-deep"
-                        />
+                        <Sticker name={reply.sticker} className="text-blush-deep" />
                         <span>{reply.label}</span>
                       </button>
                     ))}
@@ -162,7 +168,7 @@ export function LetterApp() {
                 {letter.pages.map((item, index) => (
                   <span
                     key={item.kicker}
-                    className={`h-1.5 rounded-full ${
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
                       index === page ? "w-5 bg-blush-deep" : "w-1.5 bg-blush"
                     }`}
                   />
@@ -174,7 +180,7 @@ export function LetterApp() {
             </footer>
           </article>
         ) : (
-          <div className="pad-safe relative z-10 flex flex-1 flex-col items-center justify-center px-6 text-center">
+          <div className="pad-safe relative z-10 flex flex-1 flex-col items-center justify-center-safe overflow-y-auto px-6 text-center">
             <CoverStickers />
             <p className="relative text-xs font-bold tracking-[0.22em] text-blush-deep uppercase">
               {letter.eyebrow}
@@ -182,29 +188,26 @@ export function LetterApp() {
             <h1 className="relative mt-3 font-display text-5xl leading-none font-medium text-ink italic">
               {phase === "folded" ? letter.foldedTitle : letter.coverTitle}
             </h1>
-            <div className="relative mt-8">
-              <Envelope folded={phase === "folded"} onOpen={openLetter} />
+            <div className="relative mt-4">
+              <Friends
+                key={phase}
+                pose={phase === "folded" ? "hug" : "wave"}
+                bubble={phase === "folded" ? undefined : "hi nikkie!"}
+                className="cover-pals"
+              />
+              <div className="relative z-10 -mt-12">
+                <Envelope folded={phase === "folded"} onOpen={openLetter} />
+              </div>
             </div>
-            <p className="relative mt-8 max-w-[18rem] font-hand text-[1.7rem] leading-snug text-ink-soft">
+            <p className="relative mt-6 max-w-[18rem] font-hand text-[1.6rem] leading-snug text-ink-soft">
               {phase === "folded" ? foldedNote(replies) : letter.coverNote}
             </p>
             {phase === "folded" ? (
-              <button
-                type="button"
-                className="btn btn-primary relative mt-6"
-                onClick={() => {
-                  setPage(0);
-                  setPhase("reading");
-                }}
-              >
+              <button type="button" className="btn btn-primary relative mt-5" onClick={openLetter}>
                 {letter.again}
               </button>
             ) : (
-              <button
-                type="button"
-                className="btn btn-primary relative mt-6"
-                onClick={openLetter}
-              >
+              <button type="button" className="btn btn-primary relative mt-5" onClick={openLetter}>
                 {letter.sealLabel}
               </button>
             )}
@@ -222,11 +225,25 @@ function PageExtras({
 }: {
   page: LetterPage;
   plans: string[];
-  onTogglePlan: (id: string) => void;
+  onTogglePlan: (id: string, total: number) => void;
 }) {
   switch (page.kind) {
     case "text":
+      if (page.friends) {
+        return (
+          <div className="mt-6 flex justify-center">
+            <Friends
+              pose={page.friends.pose}
+              bubble={page.friends.bubble}
+              className="page-pals"
+            />
+          </div>
+        );
+      }
       return page.stickers.length ? <StickerCluster names={page.stickers} /> : null;
+
+    case "photos":
+      return <PhotoStack photos={page.photos} hint={page.hint} />;
 
     case "bucket":
       return (
@@ -235,16 +252,20 @@ function PageExtras({
             {page.hint}
           </p>
           <ul className="mt-3 flex flex-col gap-2">
-            {page.items.map((item) => {
+            {page.items.map((item, index) => {
               const on = plans.includes(item.id);
               return (
-                <li key={item.id}>
+                <li
+                  key={item.id}
+                  className="todo-in"
+                  style={{ animationDelay: `${0.12 + index * 0.07}s` }}
+                >
                   <button
                     type="button"
                     className="todo"
                     data-on={on}
                     aria-pressed={on}
-                    onClick={() => onTogglePlan(item.id)}
+                    onClick={() => onTogglePlan(item.id, page.items.length)}
                   >
                     <Sticker name={item.sticker} size={34} className="vinyl shrink-0" />
                     <span className="flex-1 text-left">{item.label}</span>
@@ -272,11 +293,12 @@ function PageExtras({
           {page.photos.map((photo, index) => (
             <figure
               key={photo.caption}
-              className="polaroid"
+              className="polaroid polaroid-drop"
               style={{
                 rotate: `${photo.tilt}deg`,
                 marginTop: index === 1 ? 18 : 0,
                 zIndex: index === 1 ? 2 : 1,
+                animationDelay: `${0.15 + index * 0.12}s`,
               }}
             >
               <div className="polaroid-img" style={{ background: photo.tint }}>
@@ -290,32 +312,64 @@ function PageExtras({
 
     case "promise":
       return (
-        <div className="promise mt-7">
-          <span className="promise-heart promise-heart-a" aria-hidden="true">
-            <Sticker name="heart" size={22} className="text-blush" />
-          </span>
-          <span className="promise-heart promise-heart-b" aria-hidden="true">
-            <Sticker name="heart" size={16} className="text-blush-deep" />
-          </span>
-          <p className="text-xs font-bold tracking-[0.22em] text-ink-soft uppercase">
+        <div className="promise mt-6">
+          <Friends pose="hug" className="promise-pals" />
+          <p className="mt-1 text-xs font-bold tracking-[0.22em] text-ink-soft uppercase">
             protected at all costs
           </p>
           <p className="mt-1 font-display text-[2.9rem] leading-none font-semibold italic">
             <mark className="hl">{page.word}</mark>
           </p>
-          <div className="mt-4 flex justify-center gap-4">
-            {page.stickers.map((name, index) => (
-              <Sticker
-                key={name}
-                name={name}
-                size={52}
-                className={`vinyl text-blush-deep ${index % 2 ? "rotate-6" : "-rotate-6"}`}
-              />
-            ))}
-          </div>
         </div>
       );
   }
+}
+
+function PhotoStack({
+  photos,
+  hint,
+}: {
+  photos: Extract<LetterPage, { kind: "photos" }>["photos"];
+  hint: string;
+}) {
+  const [front, setFront] = useState(0);
+
+  return (
+    <div className="mt-5">
+      <p className="text-xs font-bold tracking-[0.14em] text-ink-soft uppercase">
+        {hint}
+      </p>
+      <div className="photo-stack mt-4">
+        {photos.map((photo, index) => (
+          <button
+            key={photo.src}
+            type="button"
+            className={`photo photo-${index === 0 ? "left" : "right"}`}
+            data-front={front === index}
+            aria-pressed={front === index}
+            aria-label={`${photo.caption}: ${photo.alt}`}
+            onClick={() => setFront(index)}
+            style={{
+              rotate: `${front === index ? photo.tilt / 2 : photo.tilt}deg`,
+              animationDelay: `${0.15 + index * 0.15}s`,
+            }}
+          >
+            <span className="photo-img">
+              <Image
+                src={photo.src}
+                alt={photo.alt}
+                fill
+                sizes="(max-width: 430px) 48vw, 200px"
+                style={{ objectFit: "cover", objectPosition: photo.focus }}
+                priority={index === 0}
+              />
+            </span>
+            <span className="photo-caption">{photo.caption}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function StickerCluster({ names }: { names: StickerName[] }) {
@@ -326,7 +380,7 @@ function StickerCluster({ names }: { names: StickerName[] }) {
           key={name}
           name={name}
           size={index === 0 ? 72 : 56}
-          className={`vinyl text-blush-deep ${index % 2 ? "rotate-12" : "-rotate-6"}`}
+          className={`vinyl sticker-wobble text-blush-deep ${index % 2 ? "rotate-12" : "-rotate-6"}`}
         />
       ))}
     </div>
@@ -335,10 +389,10 @@ function StickerCluster({ names }: { names: StickerName[] }) {
 
 function CoverStickers() {
   const spots: { name: StickerName; className: string; size: number }[] = [
-    { name: "cap", className: "top-[11%] left-[7%] -rotate-12", size: 60 },
-    { name: "pennant", className: "top-[9%] right-[6%] rotate-12", size: 64 },
-    { name: "coffee", className: "bottom-[9%] left-[9%] -rotate-6", size: 52 },
-    { name: "books", className: "bottom-[8%] right-[8%] rotate-6", size: 58 },
+    { name: "cap", className: "top-[8%] left-[6%] -rotate-12", size: 56 },
+    { name: "pennant", className: "top-[7%] right-[6%] rotate-12", size: 60 },
+    { name: "coffee", className: "bottom-[6%] left-[8%] -rotate-6", size: 48 },
+    { name: "books", className: "bottom-[5%] right-[8%] rotate-6", size: 54 },
   ];
   return (
     <div className="cover-stickers" aria-hidden="true">
@@ -347,7 +401,7 @@ function CoverStickers() {
           key={spot.name}
           name={spot.name}
           size={spot.size}
-          className={`vinyl absolute text-blush-deep ${spot.className}`}
+          className={`vinyl sticker-wobble absolute text-blush-deep ${spot.className}`}
         />
       ))}
     </div>
@@ -415,7 +469,7 @@ function Envelope({
   if (folded) return <div className="env">{face}</div>;
 
   return (
-    <button type="button" className="env" onClick={onOpen} aria-label={letter.sealLabel}>
+    <button type="button" className="env env-wiggle" onClick={onOpen} aria-label={letter.sealLabel}>
       {face}
     </button>
   );

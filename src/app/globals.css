@@ -434,13 +434,268 @@ mark.hl {
 .promise-heart-a { top: 14px; left: 18px; }
 .promise-heart-b { top: 26px; right: 22px; animation-delay: -2s; }
 
+/* page turns */
+.page-in {
+  animation: page-in-next 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.page-in-back {
+  animation-name: page-in-back;
+}
+
+@keyframes page-in-next {
+  from { opacity: 0; transform: translateX(40px) rotate(1.5deg); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes page-in-back {
+  from { opacity: 0; transform: translateX(-40px) rotate(-1.5deg); }
+  to { opacity: 1; transform: none; }
+}
+
+/* cartoon friends */
+.pals {
+  display: block;
+  overflow: visible;
+  animation: hop 2.4s ease-in-out infinite;
+}
+
+.cover-pals {
+  width: 200px;
+  margin-inline: auto;
+}
+
+.page-pals {
+  width: min(78vw, 280px);
+}
+
+.promise-pals {
+  width: 190px;
+  margin: -6px auto 0;
+}
+
+@keyframes hop {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.arm {
+  transform-box: view-box;
+  transform: rotate(var(--from));
+}
+
+.arm-swing {
+  transform: rotate(var(--to));
+  animation: swing 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes swing {
+  from { transform: rotate(var(--from)); }
+  to { transform: rotate(var(--to)); }
+}
+
+.blink {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: blink 4.2s infinite;
+}
+
+@keyframes blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+
+.pop {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pop 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes pop {
+  from { opacity: 0; transform: scale(0.3) rotate(-20deg); }
+  to { opacity: 1; transform: scale(1.1) rotate(0deg); }
+}
+
+.bubble {
+  transform-box: fill-box;
+  transform-origin: 20% 100%;
+  animation: bubble 2.6s ease-in-out infinite;
+}
+
+@keyframes bubble {
+  0%, 100% { transform: scale(0.94) rotate(-2deg); }
+  50% { transform: scale(1.04) rotate(2deg); }
+}
+
+.sweat {
+  transform-box: fill-box;
+  animation: sweat 1.8s ease-in infinite;
+}
+
+@keyframes sweat {
+  0% { opacity: 0; transform: translateY(-3px); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(8px); }
+}
+
+.float-heart {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: float-heart 2.6s ease-in infinite;
+}
+
+.float-heart-2 { animation-delay: 0.9s; }
+.float-heart-3 { animation-delay: 1.7s; }
+
+@keyframes float-heart {
+  0% { opacity: 0; transform: translateY(0) scale(0.5); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-36px) scale(1.15); }
+}
+
+/* envelope invites a tap */
+.env-wiggle {
+  animation: env-wiggle 3.2s ease-in-out infinite;
+}
+
+@keyframes env-wiggle {
+  0%, 80%, 100% { transform: rotate(0); }
+  84% { transform: rotate(-3deg); }
+  88% { transform: rotate(3deg); }
+  92% { transform: rotate(-2deg); }
+  96% { transform: rotate(1deg); }
+}
+
+.sticker-wobble {
+  animation: wobble 4s ease-in-out infinite;
+}
+
+.sticker-wobble:nth-child(2n) {
+  animation-delay: -1.6s;
+}
+
+@keyframes wobble {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -5px; }
+}
+
+/* lists and frames drop in */
+.todo-in {
+  animation: drop-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.polaroid-drop {
+  animation: drop-in 0.55s cubic-bezier(0.2, 0.8, 0.2, 1.2) both;
+}
+
+@keyframes drop-in {
+  from { opacity: 0; transform: translateY(-18px) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+
+/* real photos */
+.photo-stack {
+  position: relative;
+  height: 290px;
+}
+
+.photo {
+  position: absolute;
+  top: 8px;
+  display: flex;
+  width: min(46%, 186px);
+  flex-direction: column;
+  border: 0;
+  background: #fff;
+  padding: 8px 8px 0;
+  box-shadow: 0 12px 26px rgba(120, 64, 74, 0.18);
+  cursor: pointer;
+  transition: rotate 0.35s ease, scale 0.35s ease, translate 0.35s ease, filter 0.35s ease;
+  animation: drop-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1.2) both;
+}
+
+.photo-left { left: 5%; }
+.photo-right { right: 5%; top: 26px; }
+
+.photo[data-front="true"] {
+  z-index: 3;
+  scale: 1.05;
+  translate: 0 -6px;
+}
+
+.photo[data-front="false"] {
+  z-index: 1;
+  filter: saturate(0.85) brightness(0.97);
+}
+
+.photo:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.photo-img {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--lilac);
+}
+
+.photo-caption {
+  padding: 5px 0 9px;
+  text-align: center;
+  font-family: var(--font-hand);
+  font-size: 1.3rem;
+  line-height: 1;
+  color: var(--ink);
+}
+
+/* confetti */
+.confetti {
+  position: absolute;
+  z-index: 40;
+  top: 42%;
+  left: 50%;
+  pointer-events: none;
+}
+
+.confetti i {
+  position: absolute;
+  animation: confetti 1.4s cubic-bezier(0.15, 0.7, 0.3, 1) forwards;
+}
+
+@keyframes confetti {
+  0% { opacity: 1; transform: translate(0, 0) rotate(0); }
+  60% { opacity: 1; transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); }
+  100% { opacity: 0; transform: translate(var(--dx), calc(var(--dy) + 140px)) rotate(calc(var(--rot) * 2)); }
+}
+
+@media (max-height: 700px) {
+  .cover-pals { width: 150px; }
+  .env { height: 150px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .petal,
   .env-seal,
   .rise,
   .promise-heart,
-  mark.hl {
+  mark.hl,
+  .page-in,
+  .pals,
+  .pals *,
+  .env-wiggle,
+  .sticker-wobble,
+  .todo-in,
+  .polaroid-drop,
+  .photo,
+  .confetti {
     animation: none;
+  }
+
+  .confetti {
+    display: none;
   }
 
   .env-flap,

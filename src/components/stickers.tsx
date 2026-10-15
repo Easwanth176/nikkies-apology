@@ -97,7 +97,7 @@ function Art({ name }: { name: StickerName }) {
             fontWeight="800"
             letterSpacing="0.4"
             fill="#fff8f1"
-            fontFamily="var(--font-nunito), sans-serif"
+            style={{ fontFamily: "var(--font-nunito), sans-serif" }}
           >
             friends
           </text>
@@ -170,7 +170,7 @@ function Art({ name }: { name: StickerName }) {
               fontWeight="800"
               letterSpacing="1"
               fill="#4a2c32"
-              fontFamily="var(--font-nunito), sans-serif"
+              style={{ fontFamily: "var(--font-nunito), sans-serif" }}
             >
               FEST
             </text>
