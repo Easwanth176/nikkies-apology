@@ -21,7 +21,7 @@ const nunito = Nunito({
 export const metadata: Metadata = {
   title: "for nikkie",
   description:
-    "A friendship letter for Nikkie, from Lovely Professional University.",
+    "A friendship letter for Nikkie.",
   applicationName: "for nikkie",
   appleWebApp: {
     capable: true,

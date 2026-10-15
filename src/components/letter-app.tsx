@@ -124,9 +124,6 @@ export function LetterApp() {
                   <p className="font-display text-xl text-ink italic">
                     {letter.signature}
                   </p>
-                  <p className="mt-1 text-xs font-bold tracking-[0.14em] text-ink-soft uppercase">
-                    {letter.campus}
-                  </p>
                   <p className="mt-3 max-w-[18rem] text-sm leading-relaxed text-ink-soft">
                     {letter.ps}
                   </p>

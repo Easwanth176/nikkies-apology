@@ -65,9 +65,8 @@ export type ReplySticker = {
 
 export const letter = {
   recipient: "Nikkie",
-  campus: "Lovely Professional University",
   signature: "your friend",
-  eyebrow: "lovely professional university",
+  eyebrow: "a letter from campus",
   coverTitle: "for nikkie",
   coverNote: "a friendship letter, for the months we still have on this campus.",
   sealLabel: "open the letter",
@@ -92,7 +91,7 @@ export const letter = {
       kind: "text",
       kicker: "university life",
       title: "this time is never coming back.",
-      body: "Lovely Professional University only happens once. The lectures we half-listen to, the canteen gossip, the walks that take forever. I want the rest of it with you, not as a story I tell later about someone I lost.",
+      body: "University life only happens once. The lectures we half-listen to, the canteen gossip, the walks that take forever. I want the rest of it with you, not as a story I tell later about someone I lost.",
       stickers: ["campus", "books"],
     },
     {
@@ -147,14 +146,14 @@ export const letter = {
       kind: "promise",
       kicker: "my one wish",
       title: "i hope nothing in this world ruins our {friendship}.",
-      body: "Not a fight. Not a bad week. Not the day we walk out of Lovely Professional University. Whatever comes after campus, we find our way back.",
+      body: "Not a fight. Not a bad week. Not the day we walk out of this campus. Whatever comes after campus, we find our way back.",
       word: "friendship",
     },
     {
       kind: "text",
       kicker: "so…",
       title: "friends again?",
-      body: "I'm sorry. I want us better. And I want these last months at Lovely Professional University to be ours. This {friendship} is the thing I refuse to lose.",
+      body: "I'm sorry. I want us better. And I want these last months on campus to be ours. This {friendship} is the thing I refuse to lose.",
       stickers: [],
     },
   ] satisfies LetterPage[] as LetterPage[],
