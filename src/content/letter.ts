@@ -69,6 +69,7 @@ export type ReplySticker = {
 
 export const letter = {
   recipient: "Nikkie",
+  song: "/memories/background.m4a",
   signature: "your friend",
   eyebrow: "a letter from campus",
   coverTitle: "for nikkie",

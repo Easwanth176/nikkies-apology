@@ -17,15 +17,38 @@ export function LetterApp() {
   const [replies, setReplies] = useState<string[]>([]);
   const [plans, setPlans] = useState<string[]>([]);
   const [burst, setBurst] = useState(0);
+  const [soundOn, setSoundOn] = useState(true);
   const startX = useRef<number | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   const celebrate = useCallback(() => setBurst((count) => count + 1), []);
+
+  const playSong = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio || !audio.paused) return;
+    audio.volume = 0;
+    void audio.play().then(() => fadeUp(audio)).catch(() => setSoundOn(false));
+  }, []);
 
   const openLetter = useCallback(() => {
     setDirection("next");
     setPage(0);
     setPhase("reading");
-  }, []);
+    if (soundOn) playSong();
+  }, [playSong, soundOn]);
+
+  function toggleSound() {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (soundOn) {
+      audio.pause();
+      setSoundOn(false);
+      return;
+    }
+    setSoundOn(true);
+    audio.volume = 0;
+    void audio.play().then(() => fadeUp(audio)).catch(() => setSoundOn(false));
+  }
 
   const next = useCallback(() => {
     if (page >= letter.pages.length - 1) {
@@ -82,6 +105,16 @@ export function LetterApp() {
   return (
     <main className="desk">
       <section className="sheet" aria-label={`A letter for ${letter.recipient}`}>
+        <audio ref={audioRef} src={letter.song} loop preload="auto" />
+        <button
+          type="button"
+          className="sound"
+          aria-pressed={soundOn}
+          aria-label={soundOn ? "turn the song off" : "turn the song on"}
+          onClick={toggleSound}
+        >
+          <SongMark off={!soundOn} />
+        </button>
         <Petals />
         {burst > 0 ? <Confetti key={burst} /> : null}
         {phase === "reading" ? (
@@ -93,7 +126,7 @@ export function LetterApp() {
             <p className="sr-only" aria-live="polite">
               Page {page + 1} of {letter.pages.length}. {plain(current.title)}
             </p>
-            <header className="flex shrink-0 items-start justify-between">
+            <header className="flex shrink-0 items-start justify-between pr-12">
               <div className="tape" aria-hidden="true" />
               <p className="pt-1 text-xs font-bold tracking-[0.18em] text-ink-soft uppercase">
                 {page + 1} / {letter.pages.length}
@@ -442,6 +475,34 @@ function Petals() {
       <span className="petal" />
       <span className="petal" />
     </div>
+  );
+}
+
+function fadeUp(audio: HTMLAudioElement) {
+  const started = performance.now();
+  const step = (now: number) => {
+    if (audio.paused) return;
+    const t = Math.min(1, (now - started) / 800);
+    audio.volume = 0.4 * t;
+    if (t < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+function SongMark({ off }: { off: boolean }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M9 17.2a2.4 2.4 0 1 1-1.6-2.26V5.8l9.2-1.6v7.4a2.4 2.4 0 1 1-1.6 2.26V6.7L9 8.1v9.1Z"
+      />
+      {off ? (
+        <path d="M4 4.5 19.5 20" stroke="#fffaf4" strokeWidth="4" strokeLinecap="round" />
+      ) : null}
+      {off ? (
+        <path d="M4 4.5 19.5 20" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      ) : null}
+    </svg>
   );
 }
 
